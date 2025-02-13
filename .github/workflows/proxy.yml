@@ -18,9 +18,17 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.23.4'
-
+          
       - name: Install Dependencies
         run: go mod tidy
 
-      - name: Run Proxy Server
-        run: go run proxy.go -p 1080 -f 22
+      - name: Run Proxy Server (Background)
+        run: |
+          go run proxy.go -p 1080 -f 22 &  # Jalankan di background
+          echo $! > proxy_pid.txt          # Simpan PID proses
+
+      - name: Wait for Proxy to Run
+        run: sleep 10
+
+      - name: Stop Proxy Server
+        run: kill $(cat proxy_pid.txt) || echo "Process already stopped"
