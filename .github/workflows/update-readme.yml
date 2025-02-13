@@ -1,0 +1,26 @@
+name: Update README with LICENSE
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Update README.md
+        run: |
+          awk '/## License/{print; print "```"; system("cat LICENSE"); print "```"; next}1' README.md > temp.md
+          mv temp.md README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "farell@rerechanstore.eu.org"
+          git add README.md
+          git commit -m "Update README with LICENSE content" || echo "No changes to commit"
+          git push
